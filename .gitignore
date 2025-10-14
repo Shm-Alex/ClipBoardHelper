@@ -361,9 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-AppData/
-/AppData/clipboard.txt
-/AppData/clipboard_20251014_131804458.txt
-/AppData/Request.html
-/AppData/Request_20251014_125031902.html
-/AppData/Request_20251014_131434641.html
+/AppData/*
+
