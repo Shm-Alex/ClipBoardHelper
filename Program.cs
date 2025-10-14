@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
 // 👇 Добавьте это ДО создания builder
@@ -21,6 +22,20 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+// 🔍 Middleware: логировать каждый входящий запрос
+app.Use(async (context, next) =>
+{
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation(">>> REQUEST: {Method} {Url} | Headers: {Headers}",
+    context.Request.Method,
+    context.Request.GetDisplayUrl(),
+    string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}"))
+);
+
+await next();
+
+logger.LogInformation("<<< RESPONSE: {StatusCode}", context.Response.StatusCode);
+});
 
 // Configure pipeline
 //if (app.Environment.IsDevelopment())
