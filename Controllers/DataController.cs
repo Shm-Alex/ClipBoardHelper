@@ -7,7 +7,9 @@ namespace ClipBoardHelper.Controllers;
 [Route("api/[controller]")]
 public class DataController : ControllerBase
 {
-    private static readonly List<string> _dataStore = new();
+    
+    private static int _counter = 0; // начинаем с 0
+
     private readonly string _dataDirectory;
     public DataController(IWebHostEnvironment environment)
     {
@@ -20,9 +22,9 @@ public class DataController : ControllerBase
     /// Получить все данные
     /// </summary>
     [HttpGet("Data")]
-    public async Task<IActionResult> GetData()
+    public async Task<IActionResult> GetData([FromQuery] uint? archNumber = null)
     {
-        var filePath = Path.Combine(_dataDirectory, "Request.html");
+        var filePath = Path.Combine(_dataDirectory, archNumber.HasValue?$"Request_{archNumber%10}.html": "Request.html");
 
         if (!System.IO.File.Exists(filePath))
         {
@@ -99,7 +101,7 @@ public class DataController : ControllerBase
                 return StatusCode(500, $"Failed to read existing file: {ex.Message}");
             }
         }
-
+        var message = "";
         // Сравнение и сохранение с резервной копией при изменении
         if (!string.Equals(existingContent, data, StringComparison.Ordinal))
         {
@@ -107,9 +109,10 @@ public class DataController : ControllerBase
             {
                 try
                 {
-                    var backupName = $"Request_{DateTime.UtcNow:yyyyMMdd_HHmmssfff}.html";
+                    var backupName = $"Request_{Interlocked.Increment(ref _counter)%10}.html";
                     var backupPath = Path.Combine(_dataDirectory, backupName);
                     System.IO.File.Move(filePath, backupPath);
+                    message += $" перезаписан архивный файл {backupName}";
                 }
                 catch (Exception ex)
                 {
@@ -120,6 +123,7 @@ public class DataController : ControllerBase
             try
             {
                 await System.IO.File.WriteAllTextAsync(filePath, data, Encoding.UTF8);
+                message += $" данные сохранены в {filePath}";
             }
             catch (Exception ex)
             {
@@ -127,7 +131,7 @@ public class DataController : ControllerBase
             }
         }
 
-        return Ok(new { message = "Data saved successfully", savedTo = "Request.html" });
+        return Ok(new { message, savedTo = "Request.html" });
     }
 
     /// <summary>
