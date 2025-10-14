@@ -26,4 +26,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization(); // ← оставляем, даже без аутентификации — не мешает
 app.MapControllers();
 
-app.Run();
+
+app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
