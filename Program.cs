@@ -1,4 +1,15 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
+
+// 👇 Добавьте это ДО создания builder
+if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
+{
+    // Render, Fly.io и другие PaaS передают PORT
+    // ASP.NET Core читает ASPNETCORE_URLS
+    Environment.SetEnvironmentVariable("ASPNETCORE_URLS", $"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT")}");
+}
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services
 builder.Services.AddControllers();
@@ -8,10 +19,6 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<TextRequestBodyFilter>();
     c.SwaggerDoc("v1", new() { Title = "ClipBoardHelper API", Version = "v1" });
 });
-
-// 🔜 Заглушка для будущей авторизации
-// builder.Services.AddAuthentication(...);
-// builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -23,8 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // ← оставляем, даже без аутентификации — не мешает
+app.UseAuthorization();
 app.MapControllers();
 
-
-app.Run($"http://0.0.0.0:{Environment.GetEnvironmentVariable("PORT") ?? "8080"}");
+app.Run(); // ← Без аргументов!
