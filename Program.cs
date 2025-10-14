@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Text;
 
 // 👇 Добавьте это ДО создания builder
@@ -26,12 +27,20 @@ var app = builder.Build();
 app.Use(async (context, next) =>
 {
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
-logger.LogInformation(">>> REQUEST: {Method} {Url} | Headers: {Headers}",
-    context.Request.Method,
-    context.Request.GetDisplayUrl(),
-    string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}"))
-);
+    try
+    {
 
+        logger.LogInformation(">>> REQUEST: {Method} {Url} | Headers: {Headers}",
+        context.Request.Method,
+        context.Request.GetDisplayUrl(),
+        string.Join(", ", context.Request.Headers.Select(h => $"{h.Key}={h.Value}"))
+        );
+    }
+    catch (Exception e)
+    {
+        
+        logger.LogWarning(e,"Что то залогировать не смогли ");
+    }
 await next();
 
 logger.LogInformation("<<< RESPONSE: {StatusCode}", context.Response.StatusCode);
