@@ -154,7 +154,7 @@ public class DataController : ControllerBase
         }
     }
     /// <summary>
-    /// Сохранить данные в ClipBoard
+    /// Сохранить данные в ClipBoard с
     /// </summary>
     /// <remarks>
     /// Ожидается POST-запрос с телом в виде необработанного текста (например, строка для буфера обмена).
