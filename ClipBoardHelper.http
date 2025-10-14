@@ -1,0 +1,6 @@
+@ClipBoardHelper_HostAddress = http://localhost:5077
+
+GET {{ClipBoardHelper_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
