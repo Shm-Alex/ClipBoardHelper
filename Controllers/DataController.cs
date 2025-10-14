@@ -111,6 +111,11 @@ public class DataController : ControllerBase
                 {
                     var backupName = $"Request_{Interlocked.Increment(ref _counter)%10}.html";
                     var backupPath = Path.Combine(_dataDirectory, backupName);
+                    // Удаляем существующий архивный файл, если он есть
+                    if (System.IO.File.Exists(backupPath))
+                    {
+                        System.IO.File.Delete(backupPath);
+                    }
                     System.IO.File.Move(filePath, backupPath);
                     message += $" перезаписан архивный файл {backupName}";
                 }
