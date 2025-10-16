@@ -2,44 +2,94 @@
 
 namespace ClipBoardHelper.Controllers
 {
-    public record FunctionInfo(string functionName, string Description, string FunctionSiпnature,string callExample);
-    public record  AvailFunction(List<FunctionInfo> FunctionAliases);
-    public record AVAIL_FUNCTIONS_Response(List<AvailFunction> FunctionList);
+    public record Formula_Function_Argument(string Descr);
+
+    public record ParametersSignatures(
+        List<Formula_Function_Argument> args,
+        Formula_Function_Argument result);
+
+    public record Formula_One_Function(
+        List<string> names,
+        bool isOperator,
+        string descr,
+        bool visible,
+        ParametersSignatures types);
+
+    public record GET_AVAIL_FUNCTIONS_RESULT(
+        List<Formula_One_Function> functions,
+        int result);
 
     [ApiController]
     [Route("api/[controller]")]
     public class UniverseServiceController : ControllerBase
     {
-        public UniverseServiceController() { }
-        [HttpGet(nameof(UniverseServiceController.GET_AVAIL_FUNCTIONS))]
-        [ProducesResponseType(typeof(AVAIL_FUNCTIONS_Response), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GET_AVAIL_FUNCTIONS() 
+        public UniverseServiceController()
         {
-            var response = new AVAIL_FUNCTIONS_Response(
-                [new AvailFunction(
-                    [
-                    new FunctionInfo("@select"," аналог sql select", "@select:=@select( ListOfCollumns) ListOfCollumns:= ColumnName Separator ListOfCollumns ", "@select(*)"),
-                    new FunctionInfo("@выбрать"," аналог sql select", "@select:=@Выбрать( ListOfCollumns) ListOfCollumns:= ColumnName Separator ListOfCollumns ", "@выбрать(*)"),
-                    ]),
-                    new AvailFunction(
-                    [
-                    new FunctionInfo("@where"," аналог sql where clause ", "@where:=@where(.... ", "@select(*)@Where(SomePredicate(colmn))"),
-                    
-                    ]),
-                    new AvailFunction(
-                    [
-                    new FunctionInfo("@prompt"," диалог выбора из некого набора ", "@prompt(%1,%2,%3,%4,%5,%6,%7,%8,%9,%10)", "@prompt(...)"),
-                    new FunctionInfo("@Ввод"," диалог выбора из некого набора ", "@Ввод(%1,%2,%3,%4,%5,%6,%7,%8,%9,%10)", "@Ввод(...)"),
-                    ]),
-                    //@aggregate_aware
-                    new AvailFunction(
-                    [
-                    new FunctionInfo("@aggregate_aware","нипонятна!", "@aggregate_aware(....)", "@aggregate_aware(...)"),
-                    ]),
-                ]
-                );
-            return Ok(response);
         }
 
+        [HttpGet(nameof(GET_AVAIL_FUNCTIONS))]
+        [ProducesResponseType(typeof(GET_AVAIL_FUNCTIONS_RESULT), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GET_AVAIL_FUNCTIONS()
+        {
+            var response = new GET_AVAIL_FUNCTIONS_RESULT(
+                functions: new List<Formula_One_Function>
+                {
+                    new Formula_One_Function(
+                        names: new List<string> { "@select", "@выбрать" },
+                        isOperator: true,
+                        descr: "аналог sql select",
+                        visible: true,
+                        types: new ParametersSignatures(
+                            args: new List<Formula_Function_Argument>
+                            {
+                                new Formula_Function_Argument("Column Name"),
+                                new Formula_Function_Argument("*")
+                            },
+                            result: new Formula_Function_Argument("void"))),
+
+                    new Formula_One_Function(
+                        names: new List<string> { "@where" },
+                        isOperator: false,
+                        descr: "аналог sql where",
+                        visible: true,
+                        types: new ParametersSignatures(
+                            args: new List<Formula_Function_Argument>
+                            {
+                                new Formula_Function_Argument("Предикат отбора")
+                            },
+                            result: new Formula_Function_Argument("void"))),
+
+                    new Formula_One_Function(
+                        names: new List<string> { "@prompt", "@Ввод" },
+                        isOperator: false,
+                        descr: "диалог выбора из некого набора",
+                        visible: true,
+                        types: new ParametersSignatures(
+                            args: new List<Formula_Function_Argument>
+                            {
+                                new Formula_Function_Argument("PromptP1"),
+                                new Formula_Function_Argument("PromptP2"),
+                                new Formula_Function_Argument("PromptP2"),
+                                new Formula_Function_Argument("PromptP3"),
+                                new Formula_Function_Argument("PromptP4")
+                            },
+                            result: new Formula_Function_Argument("выбранный элемент, тип определяется типом колонки источника"))),
+
+                    new Formula_One_Function(
+                        names: new List<string> { "@aggregate_aware" },
+                        isOperator: false,
+                        descr: "чтото непонятное",
+                        visible: false,
+                        types: new ParametersSignatures(
+                            args: new List<Formula_Function_Argument>
+                            {
+                                new Formula_Function_Argument("aggregate_aware argument")
+                            },
+                            result: new Formula_Function_Argument("aggregate_aware result")))
+                },
+                result: 0);
+
+            return Ok(response);
+        }
     }
 }
