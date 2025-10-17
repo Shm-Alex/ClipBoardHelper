@@ -35,7 +35,7 @@ namespace ClipBoardHelper.Controllers
                 functions: new List<Formula_One_Function>
                 {
                     new Formula_One_Function(
-                        names: new List<string> { "@select", "@выбрать" },
+                        names: new List<string> { "@select", "@выбратьX" },
                         isOperator: true,
                         descr: "аналог sql select",
                         visible: true,
